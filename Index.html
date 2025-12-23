@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Image Popup</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+
+        /* Image Styling */
+        .trigger-image {
+            width: 300px;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .trigger-image:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal Background */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Card Design */
+        .modal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-card h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .info-row {
+            background: #f8f9fa;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 14px;
+            border-left: 4px solid #007bff;
+        }
+
+        .info-label {
+            font-weight: bold;
+            display: block;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .close-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="hq720.jpg" 
+         alt="Click Me" 
+         class="trigger-image" 
+         onclick="openModal()">
+
+    <div class="modal-overlay" id="myModal">
+        <div class="modal-card">
+            <h2>User Details</h2>
+            
+            <div class="info-row">
+                <span class="info-label">📱 Device / Model</span>
+                <span id="deviceInfo">Detecting...</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">📍 City & Country</span>
+                <span id="locInfo">Locating...</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">🌐 IP Address</span>
+                <span id="ipInfo">Fetching...</span>
+            </div>
+            
+            <div class="info-row" style="border-left-color: #ff4757;">
+                <span class="info-label">👤 User Name</span>
+                <span>Unknown (Private)</span>
+            </div>
+
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Step 3: Logic to fetch data
+
+        async function openModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'flex';
+
+            // 1. Get Device Info
+            const userAgent = navigator.userAgent;
+            let deviceText = "Desktop/Unknown";
+            if(/Android/i.test(userAgent)) deviceText = "Android Mobile";
+            else if(/iPhone/i.test(userAgent)) deviceText = "iPhone";
+            document.getElementById('deviceInfo').innerText = deviceText;
+
+            // 2. Fetch IP and Location (Using a free API)
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                
+                document.getElementById('ipInfo').innerText = data.ip;
+                document.getElementById('locInfo').innerText = `${data.city}, ${data.country_name}`;
+            } catch (error) {
+                document.getElementById('ipInfo').innerText = "Failed to fetch";
+                document.getElementById('locInfo').innerText = "Location blocked";
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
